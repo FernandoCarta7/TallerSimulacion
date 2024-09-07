@@ -15,10 +15,16 @@ public class TiendaMascota3 {
         double [] gananciasPorPaquete = {0,0,0,0,0};
         double mayorGanancia = 0; //Almacena la máxima ganancia
         int posicionGanancia = -1;
+        int demanda = 0;
+        int inventario = 0;
+        int inventarioEnKG = 0;
+        int donacion = 0;
+        int acumuladoDonacion = 0;
+        int acumuladoVenta = 0;
+        double gananciasNetas = 0;
+        double gananciasNetasAux = 0;
 
         Random random = new Random();
-
-
 
         //SIMULACIÓN DE MONTE CARLO PARA DETERMINAR CANTIDAD OPTIMA DE PRODUCCION
         for (int i = 0; i < DIAS_SIMULACION; i++) {
@@ -51,32 +57,79 @@ public class TiendaMascota3 {
             }
         }
 
-        mayorGanancia = gananciasPorPaquete[0];
-        posicionGanancia = 0;
+        for (int i = 0; i < gananciasPorPaquete.length; i++) {
 
-        for (int i = 1; i < gananciasPorPaquete.length; i++) {
             if ( gananciasPorPaquete[i] > mayorGanancia ) {
                 mayorGanancia = gananciasPorPaquete[i];
                 posicionGanancia = i;
             }
+          //  System.out.println("Ganancias por paquete: " + gananciasPorPaquete[i] + " posción: " + i);
         }
+        //System.out.println(" \n Mayor ganancia: " + mayorGanancia + " posición ganancia: " + posicionGanancia);
 
         cantidadPaquetes = getPaqueteOptimo(posicionGanancia);
-        //SIMULACIÓN DE MONTE CARLO PARA EL INVENTARIO Y DEMANDA
-        for (int i = 0; i < DIAS_SIMULACION; i++) {
-            double aleatorio = random.nextDouble(0,1);
-            if ( aleatorio <= 0.25 ) {
 
-            } else if ( aleatorio <= 0.40 ) {
+        /*
+        * cantidadPaquetes Guarda la cantidad de paquetes que luego de la simulación nos brinda la mejor opción
+        * para producir y configurar la maquina con esta cantidad
+        * NOTA: Al obtener este valor se muestra por consola la mejor opción
+        * */
 
-            } else if ( aleatorio <= 0.75 ) {
+        /*Iniciamos simulación con demanda e inventario,
+        teniendo en cuenta la restricción de perdida de inventario*/
 
-            } else if ( aleatorio <= 0.875 ) {
+        for (int j = 0; j < 2; j++) {
 
-            } else {
+            for (int i = 0; i < DIAS_SIMULACION; i++) {
 
+                demanda = simulacionMonteCarloDemanda();
+                inventario = inventario + cantidadPaquetes;
+
+
+                double aleatorio = random.nextDouble(0,1);
+                if ( inventario > demanda ) {
+                    acumuladoVenta = acumuladoVenta + demanda;
+                    if ( aleatorio < 0.45 && i > 0 ){
+                        inventario = 0;
+                    } else {
+                        inventario = inventario - demanda;
+                    }
+                } else {
+                    acumuladoVenta = acumuladoVenta + inventario;
+                    inventario = 0;
+                }
+
+
+                if ( inventario > 0 ){
+                    inventarioEnKG = inventario*10;
+                    donacion =  inventarioEnKG / 2;
+                    acumuladoDonacion = acumuladoDonacion + donacion;
+
+                    /**System.out.println("------------------------------");
+                    System.out.println("Inventario en kg: " + inventarioEnKG + " donacion: " + donacion + " paquetes de 2kg");
+                    System.out.println("******************************");*/
+                }
+                //System.out.println("Demanda : " + demanda + " Inventario: " + inventario);
             }
         }
+
+        gananciasNetas = (acumuladoVenta * 10 * VALOR_VENTAS) - COSTO_CROQUETAS* (acumuladoVenta + acumuladoDonacion);
+        //System.out.println("******************************");
+        //System.out.println("******************************" + "\n");
+        gananciasNetasAux = (gananciasNetas*1.2) - (COSTO_CROQUETAS*acumuladoDonacion);
+
+        System.out.println("En " + DIAS_SIMULACION + " dias se donó: " + acumuladoDonacion + " kg");
+        System.out.println("En " + DIAS_SIMULACION + " dias se vendió " + acumuladoVenta * 10 + " kg");
+        System.out.println("Ganancias netas: " + gananciasNetas/1000000 + " millones de pesos");
+
+        System.out.println("******************************" + "\n");
+        if (gananciasNetasAux > gananciasNetas){
+            System.out.println("Ganancias con aumento del 20%: " + gananciasNetasAux/1000000 + " millones de pesos");
+            System.out.println("Se recomienda aumentar la donación a 4 kg, con la condición de un aumento del 20% en ganancias");
+        }else {
+            System.out.println("No se recomienda aumentar la donación, aumento en ganancias no justifica los nuevos costos");
+        }
+
 
     }
     public static double getGanancias(int cantidadPaquetes, int valorVenta, int costoCroqueta){
@@ -101,4 +154,22 @@ public class TiendaMascota3 {
                 return 20;
         }
     }
+    public static int simulacionMonteCarloDemanda(){
+
+            Random random = new Random();
+            double aleatorio = random.nextDouble(0,1);
+
+            if ( aleatorio <= 0.25 ) {
+                return  5;
+            } else if ( aleatorio <= 0.40 ) {
+                return  10;
+            } else if ( aleatorio <= 0.75 ) {
+                return  12;
+            } else if ( aleatorio <= 0.875 ) {
+                return  15;
+            } else {
+                return  20;
+            }
+        }
+
 }
