@@ -30,7 +30,7 @@ public class Gambia {
             //Simulación para cada habitante
             for (int i = 0; i < 2000000; i++) {
                 //Caso en que si el comercio sea bueno
-                if (buenoOMalo < 0.5) {
+                if (buenoOMalo < 0.45) {
                     numAleatorio = random.nextDouble(0, 1);
                     posicionClaseSocial = determinarClaseSocial(numAleatorio);
 
