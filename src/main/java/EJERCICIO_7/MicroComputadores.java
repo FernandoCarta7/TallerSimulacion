@@ -12,6 +12,7 @@ public class MicroComputadores {
     static final double PROB_DEMANDA_1 = 0.3;
     static final double PROB_DEMANDA_2 = 0.45;
     static final double PROB_DEMANDA_3 = 0.25;
+    static int [] contador = { 0, 0, 0 };
 
     // Política de producción
     static int[][] politicaProduccion = {
@@ -30,6 +31,17 @@ public class MicroComputadores {
         for (int dia = 0; dia < diasSimulacion; dia++) {
             int demanda = generarDemanda();
             int produccion = aplicarPolitica(inventarioInicial);
+            switch ( demanda ){
+                case 1:
+                    contador[0] = contador[0] + 1;
+                    break;
+                case 2:
+                    contador[1] = contador[1] + 1;
+                    break;
+                default:
+                    contador[2] = contador[2] + 1;
+            }
+
 
             // Actualizamos el inventario
             int inventarioFinal = inventarioInicial + produccion - demanda;
@@ -45,9 +57,28 @@ public class MicroComputadores {
         // Mostramos el costo promedio por día
         double costoPromedio = costoTotal / diasSimulacion;
         System.out.printf("Costo promedio por día: %.2f $%n", costoPromedio);
+//contador [2] > contador[1] && contador [2] > contador[0]
+        if ( true ){
+            int demanda = generarDemanda();
+            int produccion = 2;
+            int inventarioInicio = 1;
+            int inventario = produccion + inventarioInicial - demanda;
+            double costo1 = calcularCostos(produccion,inventarioInicio,demanda,inventario);
+            double [] costos = { 0, 0, 0 };
+            for (int i = 0; i < 3; i++) {
+                costos[i] = calcularCostos(produccion,inventarioInicio,demanda,inventario);
+                produccion = produccion - 1;
+                inventario = inventario - 1;
+                inventarioInicio = 0;
+            }
+
+            System.out.println("Se recomienda producir dos minicomputadores cuando inventario inicial = 1");
+        }else {
+            System.out.println("No se recomienda producir dos minicomputadores cuando inventario inicial = 1");
+        }
     }
 
-    // Método para generar la demanda según las probabilidades
+    /*Metodo para generar demanda usando montecarlo*/
     public static int generarDemanda() {
         Random rand = new Random();
         double r = rand.nextDouble();
