@@ -62,7 +62,7 @@ public class Revista {
             if (revistasSobranteMes > 0){
                 totalUtilidad = totalUtilidad - revistasCompradas*costoEjemplar;
             }
-            System.out.println( (i + 1) + ", Revistas vendidas: " + revistasVendidas  + ", total utilidad: " + totalUtilidad);
+            //System.out.println( (i + 1) + ", Revistas vendidas: " + revistasVendidas  + ", total utilidad: " + totalUtilidad);
             revistasCompradas = random.nextInt(6, 12);
         }
         System.out.println("UTILIDAD TOTAL = " + totalUtilidad / 1000000 + " millones de pesos");
